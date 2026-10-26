@@ -1,0 +1,6 @@
+{
+  "appId": "it.suedtirol.schulendecountdown",
+  "appName": "Schulende Countdown",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}

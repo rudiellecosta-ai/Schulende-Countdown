@@ -1,0 +1,11 @@
+const TARGET=new Date("2027-06-16T10:00:00+02:00");
+const DEFAULT=["2026-11-02","2026-11-03","2026-11-04","2026-11-05","2026-11-06","2026-12-08","2026-12-24","2026-12-25","2026-12-26","2026-12-27","2026-12-28","2026-12-29","2026-12-30","2026-12-31","2027-01-01","2027-01-02","2027-01-03","2027-01-04","2027-01-05","2027-01-06","2027-02-08","2027-02-09","2027-02-10","2027-02-11","2027-02-12","2027-03-19","2027-03-25","2027-03-26","2027-03-27","2027-03-28","2027-03-29","2027-04-25","2027-05-01","2027-05-06","2027-05-17","2027-06-02"];
+const $=id=>document.getElementById(id),pad=n=>String(n).padStart(2,"0");
+let daysOff=new Set((localStorage.getItem("schoolCountdownDaysOff")||DEFAULT.join("\n")).split(/\s+/).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x)));
+function key(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function count(now){let d=new Date(now.getFullYear(),now.getMonth(),now.getDate()),end=new Date(2027,5,16),n=0;while(d<=end){if(d.getDay()!==0&&d.getDay()!==6&&!daysOff.has(key(d)))n++;d.setDate(d.getDate()+1)}return n}
+function render(){let diff=Math.max(0,TARGET-new Date()),s=Math.floor(diff/1000);$("days").textContent=Math.floor(s/86400).toLocaleString("de-DE");$("hours").textContent=pad(Math.floor(s%86400/3600));$("minutes").textContent=pad(Math.floor(s%3600/60));$("seconds").textContent=pad(s%60);let left=count(new Date()),total=count(new Date(2026,8,15)),pct=Math.min(100,Math.max(0,Math.round((total-left)/Math.max(total,1)*100)));$("schoolDays").textContent=left.toLocaleString("de-DE");$("progressText").textContent=pct+"%";$("progressBar").style.width=pct+"%"}
+$("toggle").onclick=()=>{$("settings").classList.toggle("hidden");$("daysOff").value=[...daysOff].sort().join("\n")};
+$("save").onclick=()=>{daysOff=new Set($("daysOff").value.split(/\s+/).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x)));localStorage.setItem("schoolCountdownDaysOff",[...daysOff].join("\n"));$("message").textContent="Gespeichert.";render()};
+$("reset").onclick=()=>{daysOff=new Set(DEFAULT);localStorage.removeItem("schoolCountdownDaysOff");$("daysOff").value=DEFAULT.join("\n");$("message").textContent="Standarddaten wiederhergestellt.";render()};
+render();setInterval(render,1000);
